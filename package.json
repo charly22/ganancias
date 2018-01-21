@@ -1,0 +1,31 @@
+{
+  "private": true,
+  "name": "ganancias",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "preact build --no-prerender --production --clean",
+    "serve": "preact build --no-prerender --production --clean && preact serve",
+    "dev": "preact watch",
+    "lint": "eslint src"
+  },
+  "eslintIgnore": [
+    "build/*"
+  ],
+  "devDependencies": {
+    "eslint": "^4.15.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-config-standard-preact": "^1.1.6",
+    "eslint-config-synacor": "^1.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-react": "^7.5.1",
+    "eslint-plugin-standard": "^3.0.1",
+    "preact-cli": "^2.0.0"
+  },
+  "dependencies": {
+    "preact": "^8.2.1",
+    "preact-compat": "^3.17.0"
+  }
+}
