@@ -18,7 +18,7 @@ h1 {
   justify-content: center;
 }
 
-input {
+.table input {
 	min-width: 20px;
   max-width: 87px;
 	font: 12px 'Source Code Pro', monospace;
@@ -29,21 +29,21 @@ input {
 	color: #356a0e;
 }
 
-input[type='checkbox'] {
+.table input[type='checkbox'] {
 	max-width: 12px;
 }
 
-input[type='number'] {
+.table input[type='number'] {
   -moz-appearance:textfield;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+.table input[type=number]::-webkit-inner-spin-button,
+.table input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-select {
+.table select {
 	-webkit-appearance: none;
   -moz-appearance: none;
 	font: 12px 'Source Code Pro', monospace;
@@ -62,14 +62,11 @@ select {
 	with: 100%;
 }
 
-.row {
+.table .row {
 	display: table-row;
 }
 
-.row.title {
-}
-
-.row.title > .cell {
+.table .row.title > .cell {
   padding: 8px 4px;
   border-top: 8px solid #d0ffd1;
 	font-style: italic;
@@ -77,24 +74,24 @@ select {
 	font-weight: 500;
 }
 
-.row.title > .cell.h {
+.table .row.title > .cell.h {
 	font-size: 1.5em;
 	font-weight: 600;
 	font-style: italic;
 }
 
-.cell {
+.table .cell {
 	display: table-cell;
 	padding: 3px 4px;
 	text-align: right;
 	border-right: 1px solid #d0ffd1;
 }
 
-.cell.-center {
+.table .cell.-center {
 	text-align: center;
 }
 
-.cell.h {
+.table .cell.h {
 	font-weight: 500;
 }
 
