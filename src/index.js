@@ -18,7 +18,12 @@ export default class App extends Component {
     return (
       <div class='body-wrapper'>
         <h1> Calculadora de Impuesto a las Ganancias de 4ta Categoría 2018</h1>
-        <Salary calculator={this.calculator} />
+        <div>
+          <div>
+            Sidebar
+          </div>
+          <Salary calculator={this.calculator} />
+        </div>
       </div>
     )
   }

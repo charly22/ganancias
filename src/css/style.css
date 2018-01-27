@@ -5,6 +5,7 @@ html, body {
 	font-size: 12px;
 	font-weight: 300;
 	color: #356a0e;
+	margin: 0px;
 }
 
 h1 {
@@ -14,8 +15,23 @@ h1 {
 .body-wrapper {
 	display: flex;
 	flex-direction: column;
-  align-items: center;
-  justify-content: center;
+}
+
+.body-wrapper > div {
+	display: flex;
+}
+
+.body-wrapper > div > * {
+}
+
+.body-wrapper > div > :first-child {
+	min-width: 200px;
+	flex-grow: 1;
+	border-right: 1px solid #d0ffd1;
+}
+
+.body-wrapper > div > :nth-child(2) {
+	background-color: #FFF;
 }
 
 .table input {
@@ -60,6 +76,7 @@ h1 {
 .table {
 	display: table;
 	with: 100%;
+	background-color: #FFF;
 }
 
 .table .row {

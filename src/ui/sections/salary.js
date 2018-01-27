@@ -116,7 +116,7 @@ export default class App extends Component {
         <DisplayRow value={this.state.sac} label='S.A.C.'
           helpText='Sueldo Anual Complementario (SAC). Se paga en 2 cuotas, una en Julio y otra en Diciembre. Se calcula por el 50% en base al mayor salario básico devengado hasta el momento' />
 
-        <DisplayRow value={this.state.socialContrib} label='Aportes y cargas sociales'
+        <DisplayRow value={this.state.socialContrib} label='Aportes'
           helpText='9% del salario básico para aportes a Obra Social. 3% por aportes previsionales y 3% por [...snip]. <br> Este calculador no considera aportes a sindicatos o convenios especiales. <br> Tiene un tope mensual del 13926.16 y de 20889.22 para los meses de S.A.C' />
 
         <InputRow value={this.state.incomeAdjustment} onChange={this.handleIncomeAdjustment} label='Ajuste de salario'
@@ -147,7 +147,7 @@ export default class App extends Component {
 
         <DisplayRow value={months} label='Retenciones' title format='raw' />
 
-        <MonthsToDistributeRow value={this.state.mtdik} onChange={this.handleMtoDiK} showIf={this.state.inKind} label='Meses a distribuir ganancias'
+        <MonthsToDistributeRow value={this.state.mtdik} onChange={this.handleMtoDiK} showIf={this.state.inKind} label='Meses a distribuir'
           helpText='Para los meses en los que se registre ingresos por Salario en Especies, este campo indica la cantidad de meses, contanto a partir del actual, durante los cuales se distribuirá el proporcional a la retención de ganancias correspondiente a ese ingreso. En caso de que se requiera que la retención relativa a ese concepto se descuente completamente en el corriente mes, se debe seleccionar "1" ' />
 
         <DisplayRow value={this.state.annualNetSalary} label='Salario neto anual'
@@ -168,7 +168,7 @@ export default class App extends Component {
         <DisplayRow value={this.state.annualRetention} label='Retenciones acumuladas'
           helpText='Acumulación de las retenciones aplicadas para los meses anteriores' />
 
-        <InputRow value={this.state.retentionAdjustment} onChange={this.handleRetentionAdjunstment} label='Ajuste de retención de ganancias'
+        <InputRow value={this.state.retentionAdjustment} onChange={this.handleRetentionAdjunstment} label='Ajuste'
           helpText='En este campo se puede ingresar un ajuste a la retención en caso que la liquidación real haya arrojado diferencia en este concepto. Dado que es un impuesto anual, este valor afecta a las subsiguiente liquidaciones, y en caso de haber una difernecia, es importante ingresarlo para que las posteriores liquidaciones sean correactas.' />
 
         <DisplayRow value={this.state.retention} label='Retenciones del mes' heading
@@ -176,7 +176,7 @@ export default class App extends Component {
 
         <DisplayRow value={months} label='Totales' title format='raw' />
 
-        <InputRow value={this.state.retroactiveTaxesRetribution} onChange={this.handleRetroactiveTaxesRetribution} label='Devolución de retenciones'
+        <InputRow value={this.state.retroactiveTaxesRetribution} onChange={this.handleRetroactiveTaxesRetribution} label='Devolución retroactivas'
           helpText='En caso de que haya surgido difrencia en la liquidación de ganancias a favor del empleado correspondiente a periodos fiscales anteriores, en el es que se produce el pago en concepto de devolución de retenciones, el mismo se debe imputar posteriormente ha al cálculo de retencioens del priodo actual para evitar la doble imposición.' />
 
         <DisplayRow value={this.state.toCharge} label='Neto a cobrar' heading
