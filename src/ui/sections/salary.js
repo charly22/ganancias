@@ -19,6 +19,15 @@ export default class App extends Component {
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.calculator !== this.calculator) {
+      this.calculator = nextProps.calculator
+      this.setState(
+        this.calculator.setInitialValues,
+      )
+    }
+  }
+
   autoFill = (key, month, value) => {
     if (!this.autofilled[key]) {
       this.autofilled[key] = true

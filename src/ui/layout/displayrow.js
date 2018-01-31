@@ -4,10 +4,18 @@ import Tooltip from '../tooltip'
 export default class DisplayRow extends Component {
   constructor (props) {
     super(props)
-    this.state = {
+    this.setState({
       value: props.value,
-    }
+    })
     this.props.format = this.props.format || 'decimal'
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.value !== parseFloat(this.value)) {
+      this.setState({
+        value: nextProps.value,
+      })
+    }
   }
 
   getRowClasses = () => {
