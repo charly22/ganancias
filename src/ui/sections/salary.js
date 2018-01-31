@@ -28,7 +28,14 @@ export default class App extends Component {
     }
   }
 
+  _callOnChange = () => {
+    if (this.props.onChange) {
+      this.props.onChange(this.calculator.setInitialValues())
+    }
+  }
+
   autoFill = (key, month, value) => {
+    // FIXME don't use a flag, also detect if there are values !== 0
     if (!this.autofilled[key]) {
       this.autofilled[key] = true
       for (let i = month + 1; i <= 11; i++) {
@@ -44,12 +51,15 @@ export default class App extends Component {
       this.calculator.setIncome('gross', month, value)
     )
     this.autoFill('gross', month, value)
+    // FIXME: call it on setState callback
+    this._callOnChange()
   }
 
   handleInKindChange = (month, value) => {
     this.setState(
       this.calculator.setIncome('inKind', month, value)
     )
+    this._callOnChange()
   }
 
   handleChildrenChange = (month, value) => {
@@ -57,6 +67,7 @@ export default class App extends Component {
       this.calculator.setDeductions('children', month, value)
     )
     this.autoFill('children', month, value)
+    this._callOnChange()
   }
 
   handleSpouseChange = (month, value) => {
@@ -64,48 +75,56 @@ export default class App extends Component {
       this.calculator.setDeductions('spouse', month, value)
     )
     this.autoFill('spouse', month, value)
+    this._callOnChange()
   }
 
   handleRentalExpensesChance = (month, value) => {
     this.setState(
       this.calculator.setDeductions('rentalExpenses', month, value)
     )
+    this._callOnChange()
   }
 
   handleMortgageCapitalChance = (month, value) => {
     this.setState(
       this.calculator.setDeductions('mortgageCapital', month, value)
     )
+    this._callOnChange()
   }
 
   handleOtherDeductionsChance = (month, value) => {
     this.setState(
       this.calculator.setDeductions('otherDeductions', month, value)
     )
+    this._callOnChange()
   }
 
   handleMtoDiK = (month, value) => {
     this.setState(
       this.calculator.setDeductions('mtdik', month, value)
     )
+    this._callOnChange()
   }
 
   handleRetentionAdjunstment = (month, value) => {
     this.setState(
       this.calculator.setDeductions('retentionAdjustment', month, value)
     )
+    this._callOnChange()
   }
 
   handleIncomeAdjustment = (month, value) => {
     this.setState(
       this.calculator.setIncome('incomeAdjustment', month, value)
     )
+    this._callOnChange()
   }
 
   handleRetroactiveTaxesRetribution = (month, value) => {
     this.setState(
       this.calculator.setAdjustment('retroactiveTaxesRetribution', month, value)
     )
+    this._callOnChange()
   }
 
   render () {

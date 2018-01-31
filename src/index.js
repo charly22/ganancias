@@ -2,29 +2,37 @@ import './css/style'
 import { Component } from 'preact'
 import Salary from './ui/sections/salary'
 import Calculator from './services/calculator'
+import Sidebar from './ui/sections/sidebar'
+import KeyValueLocalStorage from './services/keyvaluelocalstorage'
 
 export default class App extends Component {
   constructor (props) {
     super(props)
-    let initialValues
-    this.calculator = new Calculator(initialValues)
+    this.storage = new KeyValueLocalStorage('profiles')
+    this.setState({
+      calculator: new Calculator(this.storage.getCurrent().value),
+    })
   }
 
   componentDidMount () {
     document.title = 'Ganancias'
   }
 
+  handleProfileChange = (values) => {
+    this.setState({
+      calculator: new Calculator(values),
+    })
+  }
+
+  handleOnValuesChange = (values) => {
+    this.storage.setCurrent(values)
+  }
+
   render () {
     return (
-      <div class='body-wrapper'>
-        <h1> Calculadora de Impuesto a las Ganancias de 4ta Categoría 2018</h1>
-        <div>
-          <div>
-            Sidebar
-          </div>
-          <Salary calculator={this.calculator} />
-        </div>
-      </div>
+      <Sidebar onSelect={this.handleProfileChange} storage={this.storage}>
+        <Salary calculator={this.state.calculator} onChange={this.handleOnValuesChange} />
+      </Sidebar>
     )
   }
 }

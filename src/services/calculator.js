@@ -39,6 +39,7 @@ export default class Calculator {
     }
   }
 
+  // FIXME rename and return only keys that changed
   setInitialValues = () => {
     return this.salary
   }

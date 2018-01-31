@@ -1,11 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,600,700');
+@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
 html, body {
-	font: 12px 'Source Code Pro', monospace;
-	font-size: 12px;
-	font-weight: 300;
-	color: #356a0e;
 	margin: 0px;
+}
+
+html, body, input, select, button {
+	color: #356a0e;
+	font-weight: 300;
+	font: 12px 'Source Code Pro', monospace;
 }
 
 h1 {
@@ -14,24 +17,65 @@ h1 {
 
 .body-wrapper {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 }
 
-.body-wrapper > div {
-	display: flex;
-}
-
-.body-wrapper > div > * {
-}
-
-.body-wrapper > div > :first-child {
-	min-width: 200px;
+.body-wrapper > :first-child {
 	flex-grow: 1;
-	border-right: 1px solid #d0ffd1;
 }
 
-.body-wrapper > div > :nth-child(2) {
+.name-box {
+	border: 0px;
+	font-size: 20px;
+	min-width: 400px;
+	font-style: italic;
+  outline: none;
+	padding: 20px;
+	line-height: 20px;
+}
+
+.name-box::placeholder {
+	color: #AAA;
+	font-style: italic;
+}
+
+.sidebar-wrapper {
+}
+
+.sidebar {
+	width: 200px;
+	background-color: #d0ffd1;
+	padding-left: 8px;
+}
+
+button.new {
+	width: 100px;
 	background-color: #FFF;
+	font-size: 14px;
+	margin: 20px;
+	border: 0px;
+}
+
+.sidebar ul {
+	list-style: none;
+	padding: 2px;
+}
+
+.sidebar ul > li > button {
+  border: 0px;
+	outline: none;
+	cursor: pointer;
+	font-size: 1.2em;
+	border-radius: 3px;
+	max-width: 130px;
+	overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sidebar ul > li > button.icon {
+	background-color: #d0ffd1;
+	margin: 2px;
 }
 
 .table input {
@@ -62,7 +106,6 @@ h1 {
 .table select {
 	-webkit-appearance: none;
   -moz-appearance: none;
-	font: 12px 'Source Code Pro', monospace;
 	font-weight: 300;
   background-color: #d0ffd1;
 	color: #356a0e;
