@@ -1,3 +1,4 @@
 node_modules
 /build
 /*.lognode_modules/
+npm-debug.log
