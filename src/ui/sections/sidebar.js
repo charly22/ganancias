@@ -43,9 +43,8 @@ export default class Sidebar extends Component {
   }
 
   handleOnCopyButtonClick = (event) => {
-    const currentValue = this.storage.get(event.target.parentElement.value)
     this.setState(
-      this.storage.set(`Copy of ${event.target.value}`, currentValue)
+      this.storage.copy(event.target.parentElement.value, `Copy of ${event.target.parentElement.value}`)
     )
     this._callOnSelect()
   }

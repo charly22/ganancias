@@ -63,6 +63,14 @@ export default class KeyValueLocalStorage {
     return this._persist(this._DEFAULT_KEY)
   }
 
+  copy = (key, toKey) => {
+    key = key || this._DEFAULT_KEY
+    toKey = toKey || this._DEFAULT_KEY
+    let value = JSON.parse(JSON.stringify(this._storage[key]))
+    this._storage[toKey] = value
+    return this._persist(toKey)
+  }
+
   rename = (key, newKey) => {
     key = key || this._DEFAULT_KEY
     newKey = newKey || this._DEFAULT_KEY
