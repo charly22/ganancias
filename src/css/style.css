@@ -29,14 +29,25 @@ h1 {
 	font-size: 20px;
 	min-width: 400px;
 	font-style: italic;
-  outline: none;
-	padding: 20px;
-	line-height: 20px;
+	outline: none;
+	padding: 5px;
+	line-height: 15px;
+	border: 1px solid rgba(0,0,0,0);
+	border-radius: 5px;
+	margin: 10px;
 }
 
 .name-box::placeholder {
 	color: #AAA;
 	font-style: italic;
+}
+
+.name-box:hover {
+	border: 1px solid #EEE;
+}
+
+.name-box:focus {
+	border: 1px solid #DDD;
 }
 
 .sidebar-wrapper {
@@ -87,6 +98,7 @@ button.new {
   border: 0px;
   background-color: #d0ffd1;
 	color: #356a0e;
+	outline: none;
 }
 
 .table input[type='checkbox'] {
