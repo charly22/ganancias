@@ -145,7 +145,10 @@ export default class App extends Component {
           helpText='Sueldo Anual Complementario (SAC). Se paga en 2 cuotas, una en Julio y otra en Diciembre. Se calcula por el 50% en base al mayor salario básico devengado hasta el momento' />
 
         <DisplayRow value={this.state.socialContrib} label='Aportes'
-          helpText='9% del salario básico para aportes a Obra Social. 3% por aportes previsionales y 3% por [...snip]. <br> Este calculador no considera aportes a sindicatos o convenios especiales. <br> Tiene un tope mensual del 13926.16 y de 20889.22 para los meses de S.A.C' />
+          helpText='Aportes correspondientes al básico (No incluye aportes del SAC). Se calculan sumand 11% del salario básico para aportes a Obra Social. 3% por aportes previsionales y 3% por [...snip]. <br> Este calculador no considera aportes a sindicatos o convenios especiales. <br> Tiene un tope mensual del 13926.16. Para los meses con SAC, se calculan con un 50% extra del tope normal y se le restan los aportes del SAC.' />
+
+        <DisplayRow value={this.state.sacSocialContrib} label='Aportes del S.A.C.'
+          helpText='Aportes correspondientes al S.A.C. Tienen un tope igual al 50% del tope para el básico.' />
 
         <InputRow value={this.state.incomeAdjustment} onChange={this.handleIncomeAdjustment} label='Ajuste de salario'
           helpText='En este campo permite ingresar un ajuste en el salario neto, puede ser utilizado para incrementar o reducir aportes. Este impacta directamete en el salario neto y por tanto en el cálculo de las retenciones. En caso de que desee hacer un ajuste sobre las retenciones o pagos retroactivos correspondientes a otros periodos fiscales, vea los otors campos de ajuste.' />
@@ -180,6 +183,9 @@ export default class App extends Component {
 
         <DisplayRow value={this.state.annualNetSalary} label='Salario neto anual'
           helpText='Salario neto acumulado para el mes actual y los anteriores' />
+
+        <DisplayRow value={this.state.sacAnualDistribution} label='SAC neto anual distrib.'
+          helpText='Exceptuando los meses del SAC, corresponde a la doceaba parte del neto acumulado anualmente y se utiliza para estimar el SAC un prorrateo de lo que sería el SAC. Este valor se adiciona a la ganancia neta acumulada y de esta forma se distribuyen proporcionalmente las ganancias a pagar correspondientes al SAC a lo largo del año. Para los meses se toma el SAC neto real acumulado.' />
 
         <DisplayRow value={this.state.annualDeductions} label='Deducciones anuales'
           helpText='Deducciones acumuladas para el mes actual y los anteriores' />

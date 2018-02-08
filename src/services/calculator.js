@@ -1,16 +1,18 @@
 export default class Calculator {
   constructor (initialValues) {
     this.maxOfEachScale = [0, 25800, 51600, 77400, 103200, 154800, 206400, 309600, 412800, 999999999]
-    this.fixed = [0, 7675.50, 15351.00, 23026.50, 30702.00, 38377.50, 46053.00, 53728.50, 61404.00, 69079.50, 76755.00, 60006.82, 92106.00]
+    this.fixed = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 69079.5, 32192.5, 60006.82, 91941.78]
     this.aliquotes = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
     this.salary = initialValues || {
       gross: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sac: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       inKind: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       socialContrib: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      sacSocialContrib: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       incomeAdjustment: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       netSalary: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       annualNetSalary: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      sacAnualDistribution: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       spouse: [false, false, false, false, false, false, false, false, false, false, false, false],
       children: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       rentalExpenses: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -53,7 +55,6 @@ export default class Calculator {
     this.fillSac(month)
     this.fillSocialContrib(month)
     this.fillNetSalary(month)
-    this.accumulate(this.fillNetSalary, this.salary.annualNetSalary, month)
     this.fillTaxes(month)
 
     return this.salary
@@ -91,18 +92,6 @@ export default class Calculator {
     this.scan(this.fillToCharge, month)
   }
 
-  accumulate = (method, placeholder, fromMonth, toMonth = 11) => {
-    let acc = 0
-    if (fromMonth > 0) {
-      acc = placeholder[fromMonth - 1]
-    }
-
-    for (let m = fromMonth; m <= toMonth; m++) {
-      acc += method(m)
-      placeholder[m] = this.round(acc)
-    }
-  }
-
   scan = (method, fromMonth, toMonth = 11) => {
     for (let m = fromMonth; m <= toMonth; m++) {
       method(m)
@@ -116,16 +105,22 @@ export default class Calculator {
 
   fillSocialContrib = (month) => {
     let maxTaxableGross = 81918.55
+
     if ((month + 1) % 6 === 0) {
+      const taxableSac = Math.min(this.salary.sac[month], maxTaxableGross / 2)
+      this.salary.sacSocialContrib[month] =
+        this.round(taxableSac * 0.11) +
+        this.round(taxableSac * 0.03) +
+        this.round(taxableSac * 0.03)
       maxTaxableGross *= 1.5
     }
-    const taxableGross = Math.min(this.salary.gross[month] + this.salary.sac[month] + this.salary.inKind[month], maxTaxableGross)
 
-    this.salary.socialContrib[month] = this.round(
+    const taxableGross = Math.min(this.salary.gross[month] + this.salary.sac[month] + this.salary.inKind[month], maxTaxableGross)
+    this.salary.socialContrib[month] =
       this.round(taxableGross * 0.11) +
       this.round(taxableGross * 0.03) +
-      this.round(taxableGross * 0.03)
-    )
+      this.round(taxableGross * 0.03) -
+      this.salary.sacSocialContrib[month]
   }
 
   fillSac = (month) => {
@@ -146,8 +141,15 @@ export default class Calculator {
       this.salary.inKind[month] +
       this.salary.sac[month] +
       this.salary.incomeAdjustment[month] -
-      this.salary.socialContrib[month]
+      this.salary.socialContrib[month] -
+      this.salary.sacSocialContrib[month]
     )
+
+    // fill Anual Net Salary
+    for (let i = 0; i <= month; i++) {
+      this.salary.annualNetSalary[i] = this.salary.netSalary[i] - this.salary.sac[i] + this.salary.sacSocialContrib[i] +
+        ((i > 0) ? this.salary.annualNetSalary[i - 1] : 0)
+    }
 
     return this.salary.netSalary[month]
   }
@@ -193,12 +195,28 @@ export default class Calculator {
   }
 
   fillAliquot = (month) => {
-    const maxOfEachScale = [0, 25800, 51600, 77400, 103200, 154800, 206400, 309600, 412800, 999999999]
+    const maxOfEachScale = [0, 25754, 51508, 77262, 103016, 154524, 206032, 309048, 412064, 999999999]
     const fixed = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 32192.50, 60006.82, 91941.78]
     const aliquotes = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
+
+    let anualSacProportion = 0
+    const maxTaxableGross = 81918.55
+    const estimatedNetSac = this.round(this.salary.gross[month] - this.round(Math.min(this.salary.gross[month], maxTaxableGross) * 0.17))
+    if (month < 5) {
+      anualSacProportion = this.round(estimatedNetSac / 12 * (month + 1))
+    } else if (month === 5) {
+      anualSacProportion = this.salary.sac[5] - this.salary.sacSocialContrib[5]
+    } else if (month >= 6 && month < 11) {
+      anualSacProportion = this.round(estimatedNetSac / 12 * (month + 1))
+    } else if (month === 11) {
+      anualSacProportion = this.salary.sac[5] - this.salary.sacSocialContrib[5] + this.salary.sac[11] - this.salary.sacSocialContrib[11]
+    }
+    this.salary.sacAnualDistribution[month] = anualSacProportion
+
     const netProfitAcc = this.round(
       Math.max(
-        this.salary.annualNetSalary[month] -
+        this.salary.annualNetSalary[month] +
+          anualSacProportion -
           this.salary.annualDeductions[month] -
           this.salary.inKindRetentionDistribution[month].reduce((a, b) => { return a + b }, 0)
         , 0

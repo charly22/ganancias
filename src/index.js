@@ -28,11 +28,14 @@ export default class App extends Component {
     this.storage.setCurrent(values)
   }
 
+  // disable sidebar temporarely
+  // <Sidebar onSelect={this.handleProfileChange} storage={this.storage}>
+  //   <Salary calculator={this.state.calculator} onChange={this.handleOnValuesChange} />
+  // </Sidebar>
+
   render () {
     return (
-      <Sidebar onSelect={this.handleProfileChange} storage={this.storage}>
-        <Salary calculator={this.state.calculator} onChange={this.handleOnValuesChange} />
-      </Sidebar>
+      <Salary calculator={this.state.calculator} />
     )
   }
 }
