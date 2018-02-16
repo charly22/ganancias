@@ -146,9 +146,13 @@ export default class Calculator {
     )
 
     // fill Anual Net Salary
-    for (let i = 0; i <= month; i++) {
-      this.salary.annualNetSalary[i] = this.salary.netSalary[i] - this.salary.sac[i] + this.salary.sacSocialContrib[i] +
+    for (let i = month; i <= 11; i++) {
+      this.salary.annualNetSalary[i] = this.round(
+        this.salary.netSalary[i] -
+        this.salary.sac[i] +
+        this.salary.sacSocialContrib[i] +
         ((i > 0) ? this.salary.annualNetSalary[i - 1] : 0)
+      )
     }
 
     return this.salary.netSalary[month]
