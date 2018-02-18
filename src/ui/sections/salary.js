@@ -11,12 +11,6 @@ export default class App extends Component {
     this.setState(
       this.calculator.setInitialValues
     )
-
-    this.autofilled = {
-      gross: false,
-      spouse: false,
-      children: false,
-    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -30,19 +24,7 @@ export default class App extends Component {
 
   _callOnChange = () => {
     if (this.props.onChange) {
-      this.props.onChange(this.calculator.setInitialValues())
-    }
-  }
-
-  autoFill = (key, month, value) => {
-    // FIXME don't use a flag, also detect if there are values !== 0
-    if (!this.autofilled[key]) {
-      this.autofilled[key] = true
-      for (let i = month + 1; i <= 11; i++) {
-        this.setState(
-          this.calculator.setIncome(key, i, value)
-        )
-      }
+      this.props.onChange()
     }
   }
 
@@ -50,7 +32,6 @@ export default class App extends Component {
     this.setState(
       this.calculator.setIncome('gross', month, value)
     )
-    this.autoFill('gross', month, value)
     // FIXME: call it on setState callback
     this._callOnChange()
   }
@@ -66,7 +47,6 @@ export default class App extends Component {
     this.setState(
       this.calculator.setDeductions('children', month, value)
     )
-    this.autoFill('children', month, value)
     this._callOnChange()
   }
 
@@ -74,7 +54,6 @@ export default class App extends Component {
     this.setState(
       this.calculator.setDeductions('spouse', month, value)
     )
-    this.autoFill('spouse', month, value)
     this._callOnChange()
   }
 
@@ -101,7 +80,7 @@ export default class App extends Component {
 
   handleMtoDiK = (month, value) => {
     this.setState(
-      this.calculator.setDeductions('mtdik', month, value)
+      this.calculator.setDeductions('monthsToDistributeInKindRetention', month, value)
     )
     this._callOnChange()
   }
@@ -178,7 +157,7 @@ export default class App extends Component {
 
         <DisplayRow value={months} label='Retenciones' title format='raw' />
 
-        <MonthsToDistributeRow value={this.state.mtdik} onChange={this.handleMtoDiK} showIf={this.state.inKind} label='Meses a distribuir'
+        <MonthsToDistributeRow value={this.state.monthsToDistributeInKindRetention} onChange={this.handleMtoDiK} showIf={this.state.inKind} label='Meses a distribuir'
           helpText='Para los meses en los que se registre ingresos por Salario en Especies, este campo indica la cantidad de meses, contanto a partir del actual, durante los cuales se distribuirá el proporcional a la retención de ganancias correspondiente a ese ingreso. En caso de que se requiera que la retención relativa a ese concepto se descuente completamente en el corriente mes, se debe seleccionar "1" ' />
 
         <DisplayRow value={this.state.annualNetSalary} label='Salario neto anual'
@@ -213,7 +192,7 @@ export default class App extends Component {
         <InputRow value={this.state.retroactiveTaxesRetribution} onChange={this.handleRetroactiveTaxesRetribution} label='Devolución retroactivas'
           helpText='En caso de que haya surgido difrencia en la liquidación de ganancias a favor del empleado correspondiente a periodos fiscales anteriores, en el es que se produce el pago en concepto de devolución de retenciones, el mismo se debe imputar posteriormente ha al cálculo de retencioens del priodo actual para evitar la doble imposición.' />
 
-        <DisplayRow value={this.state.toCharge} label='Neto a cobrar' heading
+        <DisplayRow value={this.state.toPayOut} label='Neto a cobrar' heading
           helpText='Se calcula en base al Salario Neto (menos pagos en especies) restando la retención de ganancias calculada para el mes. Este es el importe a ser depositado en banco.' />
 
       </div>
