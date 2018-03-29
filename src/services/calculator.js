@@ -1,4 +1,4 @@
-const MAX_TAXABLE_GROSS = 81918.55
+const MAX_TAXABLE_GROSS = [81918.55, 81918.55, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10, 86596.10]
 const SCALE_MAX = [0, 25754, 51508, 77262, 103016, 154524, 206032, 309048, 412064, 999999999]
 const SCALE_FIXED = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 32192.50, 60006.82, 91941.78]
 const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
@@ -21,7 +21,7 @@ export default class Calculator {
       rentalExpenses: Array(12).fill(0),
       mortgageCapital: Array(12).fill(0),
       otherDeductions: Array(12).fill(0),
-      monthsToDistributeInKindRetention: [3,3,3,3,3,3,3,3,3,3,2,1],
+      monthsToDistributeInKindRetention: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1],
       retentionAdjustment: Array(12).fill(0),
       retroactiveTaxesRetribution: Array(12).fill(0),
     }
@@ -150,7 +150,7 @@ export default class Calculator {
   }
 
   fillSocialContrib = (month) => {
-    let maxTaxableGross = MAX_TAXABLE_GROSS
+    let maxTaxableGross = MAX_TAXABLE_GROSS[month]
 
     if ((month + 1) % 6 === 0) {
       const taxableSac = Math.min(this._calculated.sac[month], maxTaxableGross / 2)
