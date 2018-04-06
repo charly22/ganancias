@@ -47,6 +47,7 @@ export default class Calculator {
       inKindRetentionDistribution: Array(12).fill().map(u => []),
       annualRetention: Array(12).fill(0),
       toPayOut: Array(12).fill(0),
+      grandTotal: Array(12).fill(0),
     }
 
     if (initialValues) {
@@ -198,6 +199,12 @@ export default class Calculator {
         this._calculated.sac[i] +
         this._calculated.sacSocialContrib[i] +
         ((i > 0) ? this._calculated.annualNetSalary[i - 1] : 0)
+
+      this._calculated.sacAnualDistribution[i] =
+        this.round(
+          ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
+          (this._input.gross[i] / 12 - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17 / 12)
+        )
     }
 
     return this._calculated.netSalary[month]
@@ -237,23 +244,10 @@ export default class Calculator {
   }
 
   fillAliquot = (month) => {
-    let anualSacProportion = 0
-    const estimatedNetSac = this.round(this._input.gross[month] - this.round(Math.min(this._input.gross[month], MAX_TAXABLE_GROSS) * 0.17))
-    if (month < 5) {
-      anualSacProportion = this.round(estimatedNetSac / 12 * (month + 1))
-    } else if (month === 5) {
-      anualSacProportion = this._calculated.sac[5] - this._calculated.sacSocialContrib[5]
-    } else if (month >= 6 && month < 11) {
-      anualSacProportion = this.round(estimatedNetSac / 12 * (month + 1))
-    } else if (month === 11) {
-      anualSacProportion = this._calculated.sac[5] - this._calculated.sacSocialContrib[5] + this._calculated.sac[11] - this._calculated.sacSocialContrib[11]
-    }
-    this._calculated.sacAnualDistribution[month] = anualSacProportion
-
     const netProfitAcc = this.round(
       Math.max(
         this._calculated.annualNetSalary[month] +
-          anualSacProportion -
+          this._calculated.sacAnualDistribution[month] -
           this._calculated.annualDeductions[month] -
           this._calculated.inKindRetentionDistribution[month].reduce((a, b) => { return a + b }, 0)
         , 0
@@ -315,6 +309,12 @@ export default class Calculator {
       this._calculated.netSalary[month] -
       this._calculated.retention[month] -
       this._input.inKind[month] +
+      this._input.retroactiveTaxesRetribution[month]
+    )
+
+    this._calculated.grandTotal[month] = this.round(
+      this._calculated.netSalary[month] -
+      this._calculated.retention[month] +
       this._input.retroactiveTaxesRetribution[month]
     )
 

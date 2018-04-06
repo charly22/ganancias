@@ -117,8 +117,8 @@ export default class App extends Component {
         <InputRow value={this.state.gross} onChange={this.handleGrossChange} label='Salario básico'
           helpText='' />
 
-        <InputRow value={this.state.inKind} onChange={this.handleInKindChange} label='Salario en especies'
-          helpText='Valor equivalente en pesos correspondientes a pagos en especies como por ejémplo acreditación de stocks. Tiene la particularidad de que no se consideran para el cálculo del S.A.C y la retención de ganancia correspondiente al mismo puede ser distribuida en meses posteriores' />
+        <InputRow value={this.state.inKind} onChange={this.handleInKindChange} label='Salario no habitual'
+          helpText='Valor equivalente en pesos correspondientes a pagos en especies como por ejémplo acreditación de stocks o pagos no habituales como pagos retroactivos. Tiene la particularidad de que no se consideran para el cálculo del S.A.C y la retención de ganancia correspondiente al mismo puede ser distribuida en meses posteriores' />
 
         <DisplayRow value={this.state.sac} label='S.A.C.'
           helpText='Sueldo Anual Complementario (SAC). Se paga en 2 cuotas, una en Julio y otra en Diciembre. Se calcula por el 50% en base al mayor salario básico devengado hasta el momento' />
@@ -192,8 +192,11 @@ export default class App extends Component {
         <InputRow value={this.state.retroactiveTaxesRetribution} onChange={this.handleRetroactiveTaxesRetribution} label='Devolución retroactivas'
           helpText='En caso de que haya surgido difrencia en la liquidación de ganancias a favor del empleado correspondiente a periodos fiscales anteriores, en el es que se produce el pago en concepto de devolución de retenciones, el mismo se debe imputar posteriormente ha al cálculo de retencioens del priodo actual para evitar la doble imposición.' />
 
-        <DisplayRow value={this.state.toPayOut} label='Neto a cobrar' heading
-          helpText='Se calcula en base al Salario Neto (menos pagos en especies) restando la retención de ganancias calculada para el mes. Este es el importe a ser depositado en banco.' />
+        <DisplayRow value={this.state.toPayOut} label='Neto a cobrar'
+          helpText='Se calcula en base al Salario Neto (menos pagos en especies y no habituales) restando la retención de ganancias calculada para el mes. Este es el importe a ser depositado en banco.' />
+
+        <DisplayRow value={this.state.grandTotal} label='Neto total' heading
+          helpText='Se calcula en base al Salario Neto (incluido pagos en especies y no habituales) restando la retención de ganancias calculada para el mes. Este es el importe que totaliza las compensaciones en todo concepto.' />
 
       </div>
     )
