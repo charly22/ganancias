@@ -6,6 +6,7 @@ const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35
 const DEDUCTION_NON_TAXABLE = 66917.91
 const DEDUCTION_SPECIAL = 321205.968
 const DEDUCTION_PER_SON = 31461.09
+const DEDUCTION_PER_SON = 31461.09
 const DEDUCTION_DUE_SPOUSE = 62385.2
 const DEDUCTION_MAX_RENTAL_EXP = 51967
 const DEDUCTION_MAX_MORTGAGE_CAP = 20000
@@ -24,6 +25,7 @@ export default class Calculator {
       monthsToDistributeInKindRetention: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1],
       retentionAdjustment: Array(12).fill(0),
       retroactiveTaxesRetribution: Array(12).fill(0),
+      actualPayment: Array(12).fill(0),
     }
 
     this._calculated = {
@@ -32,6 +34,7 @@ export default class Calculator {
       sacSocialContrib: Array(12).fill(0),
       netSalary: Array(12).fill(0),
       annualNetSalary: Array(12).fill(0),
+      sacDistribution: Array(12).fill(0),
       sacAnualDistribution: Array(12).fill(0),
       deductions: Array(12).fill(0),
       deductionsDueFamilyResponsabilities: Array(12).fill(0),
@@ -48,6 +51,7 @@ export default class Calculator {
       annualRetention: Array(12).fill(0),
       toPayOut: Array(12).fill(0),
       grandTotal: Array(12).fill(0),
+      discrepancy: Array(12).fill(0),
     }
 
     if (initialValues) {
@@ -137,6 +141,7 @@ export default class Calculator {
     this.scan(this.fillTax, month)
     this.fillToCharge(month)
     this.scan(this.fillToCharge, month)
+    this.scan(this.fillDifference, month)
   }
 
   scan = (method, fromMonth, toMonth = 11) => {
@@ -200,10 +205,14 @@ export default class Calculator {
         this._calculated.sacSocialContrib[i] +
         ((i > 0) ? this._calculated.annualNetSalary[i - 1] : 0)
 
+      this._calculated.sacDistribution[i] = this.round(
+        (this._input.gross[i] / 12 - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17 / 12)
+      )
+
       this._calculated.sacAnualDistribution[i] =
         this.round(
           ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
-          (this._input.gross[i] / 12 - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17 / 12)
+          (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
         )
     }
 
@@ -319,5 +328,9 @@ export default class Calculator {
     )
 
     return this._calculated.toPayOut[month]
+  }
+
+  fillDifference = (month) => {
+    this._calculated.discrepancy[month] = this.round(this._input.actualPayment[month] - this._calculated.grandTotal[month])
   }
 }

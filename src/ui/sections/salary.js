@@ -106,6 +106,13 @@ export default class App extends Component {
     this._callOnChange()
   }
 
+  handleActualPaymentChange = (month, value) => {
+    this.setState(
+      this.calculator.setIncome('actualPayment', month, value)
+    )
+    this._callOnChange()
+  }
+
   render () {
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
@@ -195,9 +202,14 @@ export default class App extends Component {
         <DisplayRow value={this.state.toPayOut} label='Neto a cobrar'
           helpText='Se calcula en base al Salario Neto (menos pagos en especies y no habituales) restando la retención de ganancias calculada para el mes. Este es el importe a ser depositado en banco.' />
 
-        <DisplayRow value={this.state.grandTotal} label='Neto total' heading
+        <DisplayRow value={this.state.grandTotal} label='Neto total'
           helpText='Se calcula en base al Salario Neto (incluido pagos en especies y no habituales) restando la retención de ganancias calculada para el mes. Este es el importe que totaliza las compensaciones en todo concepto.' />
 
+        <InputRow value={this.state.actualPayment} onChange={this.handleActualPaymentChange} label='Efectivamente liquidado'
+          helpText='Salario efectivamente liquidado por el emplaor. Sirve para calcular diferencias entre la liquidación calculada y la real' />
+
+        <DisplayRow value={this.state.discrepancy} label='Discrepancia'
+          helpText='Discrepancia entre la liquidación calculada y la real' />
       </div>
     )
   }
