@@ -85,6 +85,13 @@ export default class App extends Component {
     this._callOnChange()
   }
 
+  handleSacAnualDistributionAdjustment = (month, value) => {
+    this.setState(
+      this.calculator.setIncome('sacAnualDistributionAdjustment', month, value)
+    )
+    this._callOnChange()
+  }
+
   handleRetentionAdjunstment = (month, value) => {
     this.setState(
       this.calculator.setDeductions('retentionAdjustment', month, value)
@@ -164,11 +171,17 @@ export default class App extends Component {
 
         <DisplayRow value={months} label='Retenciones' title format='raw' />
 
+        <DisplayRow value={this.state.annualSalary} label='Salario Bruto Anual' />
+
         <MonthsToDistributeRow value={this.state.monthsToDistributeInKindRetention} onChange={this.handleMtoDiK} showIf={this.state.inKind} label='Meses a distribuir'
           helpText='Para los meses en los que se registre ingresos por Salario en Especies, este campo indica la cantidad de meses, contanto a partir del actual, durante los cuales se distribuirá el proporcional a la retención de ganancias correspondiente a ese ingreso. En caso de que se requiera que la retención relativa a ese concepto se descuente completamente en el corriente mes, se debe seleccionar "1" ' />
 
+        <DisplayRow value={this.state.inKindRetentionTotalDistribution} label='In Kind Distribution' />
+
         <DisplayRow value={this.state.annualNetSalary} label='Salario neto anual'
           helpText='Salario neto acumulado para el mes actual y los anteriores' />
+
+        <InputRow value={this.state.sacAnualDistributionAdjustment} onChange={this.handleSacAnualDistributionAdjustment} label='SAC neto anual dist. adj.' />
 
         <DisplayRow value={this.state.sacAnualDistribution} label='SAC neto anual distrib.'
           helpText='Exceptuando los meses del SAC, corresponde a la doceaba parte del neto acumulado anualmente y se utiliza para estimar el SAC un prorrateo de lo que sería el SAC. Este valor se adiciona a la ganancia neta acumulada y de esta forma se distribuyen proporcionalmente las ganancias a pagar correspondientes al SAC a lo largo del año. Para los meses se toma el SAC neto real acumulado.' />

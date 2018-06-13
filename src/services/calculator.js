@@ -6,7 +6,6 @@ const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35
 const DEDUCTION_NON_TAXABLE = 66917.91
 const DEDUCTION_SPECIAL = 321205.968
 const DEDUCTION_PER_SON = 31461.09
-const DEDUCTION_PER_SON = 31461.09
 const DEDUCTION_DUE_SPOUSE = 62385.2
 const DEDUCTION_MAX_RENTAL_EXP = 51967
 const DEDUCTION_MAX_MORTGAGE_CAP = 20000
@@ -27,12 +26,16 @@ export default class Calculator {
       retroactiveTaxesRetribution: Array(12).fill(0),
       actualPayment: Array(12).fill(0),
     }
+    if (!this._input.sacAnualDistributionAdjustment) {
+      this._input.sacAnualDistributionAdjustment = Array(12).fill(0)
+    }
 
     this._calculated = {
       sac: Array(12).fill(0),
       socialContrib: Array(12).fill(0),
       sacSocialContrib: Array(12).fill(0),
       netSalary: Array(12).fill(0),
+      annualSalary: Array(12).fill(0),
       annualNetSalary: Array(12).fill(0),
       sacDistribution: Array(12).fill(0),
       sacAnualDistribution: Array(12).fill(0),
@@ -48,6 +51,7 @@ export default class Calculator {
       tax: Array(12).fill(0),
       retention: Array(12).fill(0),
       inKindRetentionDistribution: Array(12).fill().map(u => []),
+      inKindRetentionTotalDistribution: Array(12).fill(0),
       annualRetention: Array(12).fill(0),
       toPayOut: Array(12).fill(0),
       grandTotal: Array(12).fill(0),
@@ -197,6 +201,15 @@ export default class Calculator {
       this._calculated.sacSocialContrib[month]
     )
 
+    for (let i = month; i <= 11; i++) {
+      this._calculated.annualSalary[i] =
+        this._input.gross[i] +
+        this._input.inKind[i] +
+        this._input.incomeAdjustment[i] +
+        this._calculated.sac[i] +
+        ((i > 0) ? this._calculated.annualSalary[i - 1] : 0)
+    }
+
     // fill Anual Net Salary
     for (let i = month; i <= 11; i++) {
       this._calculated.annualNetSalary[i] =
@@ -212,6 +225,7 @@ export default class Calculator {
       this._calculated.sacAnualDistribution[i] =
         this.round(
           ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
+          this._input.sacAnualDistributionAdjustment[i] +
           (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
         )
     }
@@ -300,6 +314,11 @@ export default class Calculator {
 
     for (let j = monthsToDistribute; j > 0; j--) {
       this._calculated.inKindRetentionDistribution[month + monthsToDistribute - j][month] = this.round(inKind / monthsToDistribute * (j - 1))
+    }
+
+    for (let k = month; k < 11; k++) {
+      this._calculated.inKindRetentionTotalDistribution[k] =
+        this._calculated.inKindRetentionDistribution[k].reduce((a, b) => { return a + b }, 0)
     }
   }
 
