@@ -222,12 +222,21 @@ export default class Calculator {
         (this._input.gross[i] / 12 - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17 / 12)
       )
 
-      this._calculated.sacAnualDistribution[i] =
-        this.round(
-          ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
-          this._input.sacAnualDistributionAdjustment[i] +
-          (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
-        )
+      if (i !== 5 && i !== 11) {
+        this._calculated.sacAnualDistribution[i] =
+          this.round(
+            ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
+            this._input.sacAnualDistributionAdjustment[i] +
+            (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
+          )
+      } else {
+        this._calculated.sacAnualDistribution[i] =
+          this.round(
+            this._calculated.sac[i] -
+            this._calculated.sacSocialContrib[i] +
+            this._input.sacAnualDistributionAdjustment[i]
+          )
+      }
     }
 
     return this._calculated.netSalary[month]
