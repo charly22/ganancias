@@ -1,4 +1,4 @@
-# 4th category profit tax calculator according to Argentine law updated to 2018
+# Calculadora de ganancias de 4ta categoría actualizada a 2018
 
 ## Requeriments:
 
