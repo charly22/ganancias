@@ -1,4 +1,4 @@
-const MAX_TAXABLE_GROSS = [81918.55, 81918.55, 86596.10, 86596.10, 86596.10, 91523.41, 91523.41, 91523.41, 97637.14, 97637.14, 97637.14, 97637.14]
+const MAX_TAXABLE_GROSS = [81918.55, 81918.55, 86596.10, 86596.10, 86596.10, 91523.41, 91523.41, 91523.41, 97637.14, 97637.14, 97637.14, 105233.32]
 const SCALE_MAX = [0, 25754, 51508, 77262, 103016, 154524, 206032, 309048, 412064, 999999999]
 const SCALE_FIXED = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 32192.50, 60006.82, 91941.78]
 const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
@@ -213,14 +213,8 @@ export default class Calculator {
     // fill Anual Net Salary
     for (let i = month; i <= 11; i++) {
       this._calculated.annualNetSalary[i] =
-        this._calculated.netSalary[i] -
-        this._calculated.sac[i] +
-        this._calculated.sacSocialContrib[i] +
+        this._calculated.netSalary[i] +
         ((i > 0) ? this._calculated.annualNetSalary[i - 1] : 0)
-
-      this._calculated.sacDistribution[i] = this.round(
-        (this._input.gross[i] / 12 - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17 / 12)
-      )
 
       if (i !== 5 && i !== 11) {
         this._calculated.sacAnualDistribution[i] =
@@ -230,12 +224,7 @@ export default class Calculator {
             (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
           )
       } else {
-        this._calculated.sacAnualDistribution[i] =
-          this.round(
-            this._calculated.sac[i] -
-            this._calculated.sacSocialContrib[i] +
-            this._input.sacAnualDistributionAdjustment[i]
-          )
+        this._calculated.sacAnualDistribution[i] = 0
       }
     }
 
