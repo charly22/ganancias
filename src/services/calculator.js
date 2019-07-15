@@ -1,14 +1,46 @@
-const MAX_TAXABLE_GROSS = [81918.55, 81918.55, 86596.10, 86596.10, 86596.10, 91523.41, 91523.41, 91523.41, 97637.14, 97637.14, 97637.14, 105233.32]
-const SCALE_MAX = [0, 25754, 51508, 77262, 103016, 154524, 206032, 309048, 412064, 999999999]
-const SCALE_FIXED = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 32192.50, 60006.82, 91941.78]
-const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
+// 2016
+// const MAX_TAXABLE_GROSS = [48598.08, 48598.08, 56057.93, 56057.93, 56057.93, 56057.93, 56057.93, 56057.93, 63995.73, 63995.73, 63995.73, 63995.73]
+// const SCALE_MAX = [0, 10000, 20000, 30000, 60000, 90000, 120000, 999999999]
+// const SCALE_FIXED = [0, 900, 2300, 4200, 11100, 19200, 28500]
+// const SCALE_ALIQUOTES = [0, 0.09, 0.14, 0.19, 0.23, 0.27, 0.31, 0.35]
+// const DEDUCTION_NON_TAXABLE = 42318
+// const DEDUCTION_SPECIAL = 203126.40
+// const DEDUCTION_PER_SON = 19889
+// const DEDUCTION_DUE_SPOUSE = 39778
+// const DEDUCTION_MAX_RENTAL_EXP = 85849
+// const DEDUCTION_MAX_MORTGAGE_CAP = 20000
+// const ENABLE_SAC_DISTRIBUTION = false
+// const DEDUCTION_DOMESTIC = 0
 
-const DEDUCTION_NON_TAXABLE = 66917.91
-const DEDUCTION_SPECIAL = 321205.968
-const DEDUCTION_PER_SON = 31461.09
-const DEDUCTION_DUE_SPOUSE = 62385.2
-const DEDUCTION_MAX_RENTAL_EXP = 51967
-const DEDUCTION_MAX_MORTGAGE_CAP = 40000
+// 2018
+// const MAX_TAXABLE_GROSS = [81918.55, 81918.55, 86596.10, 86596.10, 86596.10, 91523.41, 91523.41, 91523.41, 97637.14, 97637.14, 97637.14, 105233.32]
+// const SCALE_MAX = [0, 25754, 51508, 77262, 103016, 154524, 206032, 309048, 412064, 999999999]
+// const SCALE_FIXED = [0, 1287.7, 3605.56, 6696.04, 10559.14, 20345.66, 32192.50, 60006.82, 91941.78]
+// const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
+// const DEDUCTION_NON_TAXABLE = 66917.91
+// const DEDUCTION_SPECIAL = 321205.968
+// const DEDUCTION_PER_SON = 31461.09
+// const DEDUCTION_DUE_SPOUSE = 62385.2
+// const DEDUCTION_MAX_RENTAL_EXP = 51967
+// const DEDUCTION_MAX_MORTGAGE_CAP = 40000
+// const ENABLE_SAC_DISTRIBUTION = true
+// const DEDUCTION_DOMESTIC = 66917
+
+// 2019
+// http://www.afip.gob.ar/gananciasYBienes/documentos/DEDUCCIONES-PARA-PERIODO-2019-RIPTE.pdf
+// http://www.afip.gob.ar/gananciasYBienes/documentos/TablaART90-Periodo2019.pdf
+const MAX_TAXABLE_GROSS = [105233.32, 105233.32, 117682.47, 117682.47, 117682.47, 130321.52, 130321.52, 130321.52, 130321.52, 130321.52, 130321.52, 130321.52]
+const SCALE_MAX = [0, 33039.81, 66079.61, 99119.42, 132159.23, 198238.84, 264318.45, 396477.68, 528636.91, 999999999999]
+const SCALE_FIXED = [0, 1651.99, 4625.57, 8590.35, 13546.32, 26101.45, 41299.76, 76982.75, 117952.11]
+const SCALE_ALIQUOTES = [0, 0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
+const DEDUCTION_NON_TAXABLE = 85848.99
+const DEDUCTION_SPECIAL = 412075.14
+const DEDUCTION_PER_SON = 40361.43
+const DEDUCTION_DUE_SPOUSE = 80033.97
+const DEDUCTION_MAX_RENTAL_EXP = 85849
+const DEDUCTION_MAX_MORTGAGE_CAP = 20000
+const ENABLE_SAC_DISTRIBUTION = true
+const DEDUCTION_DOMESTIC = 85848.99
 
 export default class Calculator {
   constructor (initialValues) {
@@ -20,14 +52,26 @@ export default class Calculator {
       children: Array(12).fill(0),
       rentalExpenses: Array(12).fill(0),
       mortgageCapital: Array(12).fill(0),
+      domestic: Array(12).fill(0),
       otherDeductions: Array(12).fill(0),
       monthsToDistributeInKindRetention: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1],
       retentionAdjustment: Array(12).fill(0),
+      actualRetention: Array(12).fill(0),
       retroactiveTaxesRetribution: Array(12).fill(0),
       actualPayment: Array(12).fill(0),
+      secondActualPayment: Array(12).fill(0),
     }
     if (!this._input.sacAnualDistributionAdjustment) {
       this._input.sacAnualDistributionAdjustment = Array(12).fill(0)
+    }
+    if (!this._input.actualRetention) {
+      this._input.actualRetention = Array(12).fill(0)
+    }
+    if (!this._input.secondActualPayment) {
+      this._input.secondActualPayment = Array(12).fill(0)
+    }
+    if (!this._input.domestic) {
+      this._input.domestic = Array(12).fill(0)
     }
 
     this._calculated = {
@@ -37,7 +81,6 @@ export default class Calculator {
       netSalary: Array(12).fill(0),
       annualSalary: Array(12).fill(0),
       annualNetSalary: Array(12).fill(0),
-      sacDistribution: Array(12).fill(0),
       sacAnualDistribution: Array(12).fill(0),
       deductions: Array(12).fill(0),
       deductionsDueFamilyResponsabilities: Array(12).fill(0),
@@ -145,7 +188,6 @@ export default class Calculator {
     this.scan(this.fillTax, month)
     this.fillToCharge(month)
     this.scan(this.fillToCharge, month)
-    this.scan(this.fillDifference, month)
   }
 
   scan = (method, fromMonth, toMonth = 11) => {
@@ -160,7 +202,7 @@ export default class Calculator {
   }
 
   fillSocialContrib = (month) => {
-    let maxTaxableGross = MAX_TAXABLE_GROSS[month]
+    const maxTaxableGross = MAX_TAXABLE_GROSS[month]
 
     if ((month + 1) % 6 === 0) {
       const taxableSac = Math.min(this._calculated.sac[month], maxTaxableGross / 2)
@@ -168,15 +210,13 @@ export default class Calculator {
         this.round(taxableSac * 0.11) +
         this.round(taxableSac * 0.03) +
         this.round(taxableSac * 0.03)
-      maxTaxableGross *= 1.5
     }
 
-    const taxableGross = Math.min(this._input.gross[month] + this._calculated.sac[month] + this._input.inKind[month], maxTaxableGross)
+    const taxableGross = Math.min(this._input.gross[month] + this._input.inKind[month], maxTaxableGross)
     this._calculated.socialContrib[month] =
       this.round(taxableGross * 0.11) +
       this.round(taxableGross * 0.03) +
-      this.round(taxableGross * 0.03) -
-      this._calculated.sacSocialContrib[month]
+      this.round(taxableGross * 0.03)
   }
 
   fillSac = (month) => {
@@ -188,6 +228,7 @@ export default class Calculator {
     workedMonths = this._input.gross.slice(5, 11).length - this._input.gross.slice(5, 11).filter(v => {
       return v <= 0
     }).length
+
     this._calculated.sac[11] = this.round(Math.max(...this._input.gross) / 12 * workedMonths)
   }
 
@@ -216,7 +257,7 @@ export default class Calculator {
         this._calculated.netSalary[i] +
         ((i > 0) ? this._calculated.annualNetSalary[i - 1] : 0)
 
-      if (i !== 5 && i !== 11) {
+      if (ENABLE_SAC_DISTRIBUTION === true && i !== 5 && i !== 11) {
         this._calculated.sacAnualDistribution[i] =
           this.round(
             ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
@@ -254,6 +295,9 @@ export default class Calculator {
     }
     if (this._input.mortgageCapital[month] > 0) {
       deductionsDueFamilyResponsabilities += Math.min(this._input.mortgageCapital[month], this.round(DEDUCTION_MAX_MORTGAGE_CAP / 12))
+    }
+    if (this._input.domestic[month] > 0) {
+      deductionsDueFamilyResponsabilities += Math.min(this._input.domestic[month], this.round(DEDUCTION_DOMESTIC / 12))
     }
     deductionsDueFamilyResponsabilities += this.round(this._input.otherDeductions[month])
 
@@ -325,11 +369,18 @@ export default class Calculator {
       this._calculated.annualRetention[month] = this.round(this._calculated.retention[month - 1] + this._calculated.annualRetention[month - 1])
     }
 
-    this._calculated.retention[month] = this.round(
-      this._calculated.tax[month] -
-      this._calculated.annualRetention[month] -
-      this._input.retentionAdjustment[month]
-    )
+    if (this._input.actualRetention[month]) {
+      this._calculated.retention[month] = this.round(
+        this._input.actualRetention[month] -
+        this._input.retentionAdjustment[month]
+      )
+    } else {
+      this._calculated.retention[month] = this.round(
+        this._calculated.tax[month] -
+        this._calculated.annualRetention[month] -
+        this._input.retentionAdjustment[month]
+      )
+    }
 
     this._calculated.toPayOut[month] = this.round(
       this._calculated.netSalary[month] -
@@ -344,10 +395,101 @@ export default class Calculator {
       this._input.retroactiveTaxesRetribution[month]
     )
 
+    this.scan(this.fillDifference, month)
+
     return this._calculated.toPayOut[month]
   }
 
   fillDifference = (month) => {
-    this._calculated.discrepancy[month] = this.round(this._input.actualPayment[month] - this._calculated.grandTotal[month])
+    this._calculated.discrepancy[month] = this.round(
+      this._input.actualPayment[month] +
+      this._input.secondActualPayment[month] -
+      this._calculated.grandTotal[month]
+    )
+  }
+
+  getWorkPapers = (month) => {
+    const mes = ['Enero', 'Feb', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Sept', 'Oct', 'Nov', 'Dic'][month]
+
+    const str = `Papeles de trabajo
+
+    Bruto ${mes} (Básico + Stocks + Bonos):
+    ${this.toStr(
+      this._input.gross[month] + this._input.inKind[month]
+    )}
+
+    SAC ${mes}:
+    ${this.toStr(
+      this._calculated.sac[month]
+    )}
+
+    Neto ${mes} (SAC + Básico - Aportes - Aportes SAC):
+    ${this.toStr(
+      this._calculated.netSalary[month]
+    )}
+
+    —— Ganancias ——
+
+    Aportes anuales:
+    ${this.toStr(
+      this._calculated.socialContrib.slice(0, parseInt(month) + 1).reduce((a, b) => a + b, 0) +
+      this._calculated.sacSocialContrib.slice(0, parseInt(month) + 1).reduce((a, b) => a + b, 0)
+    )}
+
+    Bruto anual:
+    ${this.toStr(
+      this._calculated.annualSalary[month]
+    )}
+
+    Distribuciones ${mes}:
+    ${this.toStr(
+      this._calculated.sacAnualDistribution[month]
+    )}
+    ${
+      this._calculated.inKindRetentionDistribution[month].filter(a => !!a).map(this.toStr).join('\n    ')
+    }
+    ---
+    ${this.toStr(
+      this._calculated.inKindRetentionDistribution[month].reduce((a, b) => a + b)
+    )}
+
+    Deducciones anuales:
+    ${this.toStr(
+      this._calculated.annualDeductions[month]
+    )}
+
+    Ganancia Imponible anual (Bruto anual - Aportes anuales - Deducciones anuales - Distribuciones):
+    ${this.toStr(
+      this._calculated.profit[month]
+    )}
+
+    Impuesto a ganancias anual ( ${this.toStr(this._calculated.scale.fixed[month])} + (Ganancia Imponible anual - ${this.toStr(this._calculated.scale.base[month])}) * ${this._calculated.scale.aliquot[month] * 100}% )
+    ${this.toStr(
+      this._calculated.tax[month]
+    )}
+
+    Retenciones anteriores a ${mes} (41,833.74 + 50,971.64 + 55,129.42 + 74,930.53 +  43,246.16)
+    ${this.toStr(
+      this._calculated.annualRetention[month]
+    )}
+
+    Retención resultante p/${mes}  (Impuesto anual - Retenciones acumuladas):
+    ${this.toStr(
+      this._calculated.retention[month]
+    )}
+
+    ——
+
+    Neto a cobrar
+    ${this.toStr(
+      this._calculated.toPayOut[month]
+    )}
+    `
+
+    return str
+  }
+
+  toStr = (value) => {
+    return this.round(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
   }
 }

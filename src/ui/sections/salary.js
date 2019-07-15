@@ -2,6 +2,7 @@ import { Component } from 'preact'
 import DisplayRow from '../../ui/layout/displayrow'
 import InputRow from '../../ui/layout/inputrow'
 import MonthsToDistributeRow from '../../ui/layout/monthstodistributerow'
+import ButtonRow from '../../ui/layout/buttonrow'
 
 export default class App extends Component {
   constructor (props) {
@@ -71,6 +72,13 @@ export default class App extends Component {
     this._callOnChange()
   }
 
+  handleDomestic = (month, value) => {
+    this.setState(
+      this.calculator.setDeductions('domestic', month, value)
+    )
+    this._callOnChange()
+  }
+
   handleOtherDeductionsChance = (month, value) => {
     this.setState(
       this.calculator.setDeductions('otherDeductions', month, value)
@@ -99,6 +107,13 @@ export default class App extends Component {
     this._callOnChange()
   }
 
+  handleActualRetention = (month, value) => {
+    this.setState(
+      this.calculator.setDeductions('actualRetention', month, value)
+    )
+    this._callOnChange()
+  }
+
   handleIncomeAdjustment = (month, value) => {
     this.setState(
       this.calculator.setIncome('incomeAdjustment', month, value)
@@ -120,11 +135,35 @@ export default class App extends Component {
     this._callOnChange()
   }
 
+  handleSecondActualPayment = (month, value) => {
+    console.log(month, value)
+    this.setState(
+      this.calculator.setIncome('secondActualPayment', month, value)
+    )
+    this._callOnChange()
+  }
+
+  handleWorkPapers = (month) => {
+    let str = this.calculator.getWorkPapers(month, this.state.currentKey)
+    console.log(str)
+    const el = document.createElement('textarea')
+    el.value = str
+    el.setAttribute('readonly', '')
+    el.style.position = 'absolute'
+    el.style.left = '-9999px'
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  }
+
   render () {
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
     return (
       <div class='table'>
+
+        <ButtonRow label='' onChange={this.handleWorkPapers} />
 
         <DisplayRow value={months} label='Salario Neto' title format='raw' />
 
@@ -162,6 +201,9 @@ export default class App extends Component {
 
         <InputRow value={this.state.mortgageCapital} onChange={this.handleMortgageCapitalChance} label='Crédito hipotecario'
           helpText='Parte de la cuota de un crédito hipotecario para adquisición de vivienda propia que corresponde a los intereses (es decir no al capital). Tiene un tope anual de 20,000 pesos. <br> En caso de condominio se debe ingresar la parte proporcional al porcentaje de propiedad. Por ej, si se pagan intereses por pesos 2,000 y se comparte el 50% de la propiedad, se deben ingresar pesos 1,000.' />
+
+        <InputRow value={this.state.domestic} onChange={this.handleDomestic} label='Empleado Casas Part.'
+          helpText='Deducciones por empleado de casas particulares' />
 
         <InputRow value={this.state.otherDeductions} onChange={this.handleOtherDeductionsChance} label='Otras deducciones'
           helpText='En este campo se pueden ingresar otras deducciones no expresamente contempladas por este calculador. <br> Es de suma importancia tener en cuenta los topes y particularidades de cada deduccion, como por ejémplo en caso de los gastos médicos, no importa en que mes fueron devengados, se computan recien en el último mes y además tienen un topo anual del [...snip]' />
@@ -204,6 +246,9 @@ export default class App extends Component {
         <InputRow value={this.state.retentionAdjustment} onChange={this.handleRetentionAdjunstment} label='Ajuste'
           helpText='En este campo se puede ingresar un ajuste a la retención en caso que la liquidación real haya arrojado diferencia en este concepto. Dado que es un impuesto anual, este valor afecta a las subsiguiente liquidaciones, y en caso de haber una difernecia, es importante ingresarlo para que las posteriores liquidaciones sean correactas.' />
 
+        <InputRow value={this.state.actualRetention} onChange={this.handleActualRetention} label='Efectivamente retenido'
+          helpText='En caso de que en la liquidación real se haya retenido un valor diferente, se puede especificar acá. Funciona similar al ajuste pero es más simple de utilizar porque no hay que hacer el cálculo de la diferencia. Es complementario al ajuste.' />
+
         <DisplayRow value={this.state.retention} label='Retenciones del mes' heading
           helpText='En base al <strong>Impuesto anual</strong> determinado, se restan las retenciones acumuladas aplicadas hasta ahora y de esa diferencia surge el monto a retener en el corriente mes' />
 
@@ -218,11 +263,13 @@ export default class App extends Component {
         <DisplayRow value={this.state.grandTotal} label='Neto total'
           helpText='Se calcula en base al Salario Neto (incluido pagos en especies y no habituales) restando la retención de ganancias calculada para el mes. Este es el importe que totaliza las compensaciones en todo concepto.' />
 
-        <InputRow value={this.state.actualPayment} onChange={this.handleActualPaymentChange} label='Efectivamente liquidado'
-          helpText='Salario efectivamente liquidado por el emplaor. Sirve para calcular diferencias entre la liquidación calculada y la real' />
+        <InputRow value={this.state.actualPayment} onChange={this.handleActualPaymentChange} label='Pago 1' helpText='1er pago. Sirve para calcular diferencias entre la liquidación calculada y la real' />
+
+        <InputRow value={this.state.secondActualPayment} onChange={this.handleSecondActualPayment} label='Pago 2' helpText='2do pago. Sirve para calcular diferencias entre la liquidación calculada y la real' />
 
         <DisplayRow value={this.state.discrepancy} label='Discrepancia'
           helpText='Discrepancia entre la liquidación calculada y la real' />
+
       </div>
     )
   }
