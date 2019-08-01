@@ -31,9 +31,16 @@ export default class App extends Component {
 
   handleGrossChange = (month, value) => {
     this.setState(
-      this.calculator.setIncome('gross', month, value)
+      this.calculator.setIncome('basic', month, value)
     )
     // FIXME: call it on setState callback
+    this._callOnChange()
+  }
+
+  handleComissionsChance = (month, value) => {
+    this.setState(
+      this.calculator.setIncome('comissions', month, value)
+    )
     this._callOnChange()
   }
 
@@ -167,8 +174,11 @@ export default class App extends Component {
 
         <DisplayRow value={months} label='Salario Neto' title format='raw' />
 
-        <InputRow value={this.state.gross} onChange={this.handleGrossChange} label='Salario básico'
+        <InputRow value={this.state.basic} onChange={this.handleGrossChange} label='Salario básico'
           helpText='' />
+
+        <InputRow value={this.state.comissions} onChange={this.handleComissionsChance} label='Comisiones'
+          helpText='Comisiones y pagos adicionales al básico que cuentan para el SAC' />
 
         <InputRow value={this.state.inKind} onChange={this.handleInKindChange} label='Salario no habitual'
           helpText='Valor equivalente en pesos correspondientes a pagos en especies como por ejémplo acreditación de stocks o pagos no habituales como pagos retroactivos. Tiene la particularidad de que no se consideran para el cálculo del S.A.C y la retención de ganancia correspondiente al mismo puede ser distribuida en meses posteriores' />

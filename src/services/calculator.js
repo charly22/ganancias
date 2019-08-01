@@ -45,7 +45,8 @@ const DEDUCTION_DOMESTIC = 85848.99
 export default class Calculator {
   constructor (initialValues) {
     this._input = initialValues || {
-      gross: Array(12).fill(0),
+      basic: Array(12).fill(0),
+      comissions: Array(12).fill(0),
       inKind: Array(12).fill(0),
       incomeAdjustment: Array(12).fill(0),
       spouse: Array(12).fill(false),
@@ -72,6 +73,9 @@ export default class Calculator {
     }
     if (!this._input.domestic) {
       this._input.domestic = Array(12).fill(0)
+    }
+    if (!this._input.comissions) {
+      this._input.comissions = Array(12).fill(0)
     }
 
     this._calculated = {
@@ -103,9 +107,12 @@ export default class Calculator {
 
     if (initialValues) {
       for (let m = 0; m <= 11; m++) {
-        this.setIncome('gross', m, this._input.gross[m], true)
+        this.setIncome('basic', m, this._input.basic[m], true)
         if (this._input.inKind[m]) {
           this.setIncome('inKind', m, this._input.inKind[m], true)
+        }
+        if (this._input.comissions[m]) {
+          this.setIncome('comissions', m, this._input.comissions[m], true)
         }
       }
     }
@@ -139,7 +146,7 @@ export default class Calculator {
       this.fillInKindRetentionDistribution(month, value)
     }
 
-    if (key === 'gross' && !dontAutofill) {
+    if (key === 'basic' && !dontAutofill) {
       this.autoFill(key, this._input[key], this.setIncome, month, value)
     }
 
@@ -212,7 +219,7 @@ export default class Calculator {
         this.round(taxableSac * 0.03)
     }
 
-    const taxableGross = Math.min(this._input.gross[month] + this._input.inKind[month], maxTaxableGross)
+    const taxableGross = Math.min(this._input.basic[month] + this._input.comissions[month] + this._input.inKind[month], maxTaxableGross)
     this._calculated.socialContrib[month] =
       this.round(taxableGross * 0.11) +
       this.round(taxableGross * 0.03) +
@@ -220,21 +227,27 @@ export default class Calculator {
   }
 
   fillSac = (month) => {
-    let workedMonths = this._input.gross.slice(0, 6).length - this._input.gross.slice(0, 6).filter(v => {
+    const sacElegible = this._input.basic.map((v, k) => {
+      return v + this._input.comissions[k]
+    })
+
+    let workedMonths = sacElegible.slice(0, 6).length - sacElegible.slice(0, 6).filter(v => {
       return v <= 0
     }).length
-    this._calculated.sac[5] = this.round(Math.max(...(this._input.gross.slice(0, 6))) / 12 * workedMonths)
 
-    workedMonths = this._input.gross.slice(5, 11).length - this._input.gross.slice(5, 11).filter(v => {
+    this._calculated.sac[5] = this.round(Math.max(...(sacElegible.slice(0, 6))) / 12 * workedMonths)
+
+    workedMonths = sacElegible.slice(5, 11).length - sacElegible.slice(5, 11).filter(v => {
       return v <= 0
     }).length
 
-    this._calculated.sac[11] = this.round(Math.max(...this._input.gross) / 12 * workedMonths)
+    this._calculated.sac[11] = this.round(Math.max(...sacElegible) / 12 * workedMonths)
   }
 
   fillNetSalary = (month) => {
     this._calculated.netSalary[month] = this.round(
-      this._input.gross[month] +
+      this._input.basic[month] +
+      this._input.comissions[month] +
       this._input.inKind[month] +
       this._input.incomeAdjustment[month] +
       this._calculated.sac[month] -
@@ -244,7 +257,8 @@ export default class Calculator {
 
     for (let i = month; i <= 11; i++) {
       this._calculated.annualSalary[i] =
-        this._input.gross[i] +
+        this._input.basic[i] +
+        this._input.comissions[i] +
         this._input.inKind[i] +
         this._input.incomeAdjustment[i] +
         this._calculated.sac[i] +
@@ -262,7 +276,10 @@ export default class Calculator {
           this.round(
             ((i > 0) ? this._calculated.sacAnualDistribution[i - 1] : 0) +
             this._input.sacAnualDistributionAdjustment[i] +
-            (this._input.gross[i] - Math.min(this._input.gross[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
+            (
+              this._input.basic[i] +
+              this._input.comissions[i] +
+              -Math.min(this._input.basic[i] + this._input.comissions[i], MAX_TAXABLE_GROSS[i]) * 0.17) / 12
           )
       } else {
         this._calculated.sacAnualDistribution[i] = 0
@@ -415,10 +432,10 @@ export default class Calculator {
 
     Bruto ${mes} (Básico + Stocks + Bonos):
     ${this.toStr(
-      this._input.gross[month] + this._input.inKind[month]
+      this._input.basic[month] + this._input.inKind[month] + this._input.comissions[month]
     )}
 
-    SAC ${mes}:
+    SAC:
     ${this.toStr(
       this._calculated.sac[month]
     )}
@@ -430,27 +447,28 @@ export default class Calculator {
 
     —— Ganancias ——
 
+    Bruto anual:
+    ${this.toStr(
+      this._calculated.annualSalary[month]
+    )}
+
     Aportes anuales:
     ${this.toStr(
       this._calculated.socialContrib.slice(0, parseInt(month) + 1).reduce((a, b) => a + b, 0) +
       this._calculated.sacSocialContrib.slice(0, parseInt(month) + 1).reduce((a, b) => a + b, 0)
     )}
 
-    Bruto anual:
-    ${this.toStr(
-      this._calculated.annualSalary[month]
-    )}
-
     Distribuciones ${mes}:
     ${this.toStr(
       this._calculated.sacAnualDistribution[month]
-    )}
-    ${
+    )} (SAC)
+    -${
       this._calculated.inKindRetentionDistribution[month].filter(a => !!a).map(this.toStr).join('\n    ')
     }
-    ---
+    ------
     ${this.toStr(
-      this._calculated.inKindRetentionDistribution[month].reduce((a, b) => a + b)
+      -this._calculated.inKindRetentionDistribution[month].reduce((a, b) => a + b) +
+      this._calculated.sacAnualDistribution[month]
     )}
 
     Deducciones anuales:
@@ -458,7 +476,7 @@ export default class Calculator {
       this._calculated.annualDeductions[month]
     )}
 
-    Ganancia Imponible anual (Bruto anual - Aportes anuales - Deducciones anuales - Distribuciones):
+    Ganancia Imponible anual (Bruto anual - Aportes anuales + Deducciones anuales - Distribuciones):
     ${this.toStr(
       this._calculated.profit[month]
     )}
