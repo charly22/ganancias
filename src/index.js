@@ -34,11 +34,11 @@ export default class App extends Component {
 
   render () {
     return (
-      <GoogleSignIn onSignIn={this.onSignIn}>
-        <Sidebar onSelect={this.handleProfileChange} storage={this.storage}>
-          <Salary calculator={this.state.calculator} onChange={this.handleOnValuesChange} />
-        </Sidebar>
-      </GoogleSignIn>
+      // <GoogleSignIn onSignIn={this.onSignIn}>
+      <Sidebar onSelect={this.handleProfileChange} storage={this.storage}>
+        <Salary calculator={this.state.calculator} onChange={this.handleOnValuesChange} />
+      </Sidebar>
+      // </GoogleSignIn>
     )
   }
 }
