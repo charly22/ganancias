@@ -30,7 +30,7 @@ export default class GoogleSignIn extends Component {
 
         const initClient = () => {
           return gapi.client.init({
-            apiKey: 'AIzaSyBrXqEiDsVA7nqQOwhmiLzKeGA7U__tG_A',
+            apiKey: 'xxx',
             clientId: '309171788996-lvnka9bte9c5t62dnmd20chafjmsqvfv.apps.googleusercontent.com',
             discoveryDocs: [ 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest' ],
             scope: 'https://www.googleapis.com/auth/drive.appdata',
